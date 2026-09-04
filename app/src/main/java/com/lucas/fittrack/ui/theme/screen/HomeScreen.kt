@@ -22,19 +22,23 @@ import com.lucas.fittrack.model.MealItem
 import com.lucas.fittrack.model.MealType
 import com.lucas.fittrack.model.calculateDailyNutrients
 import com.lucas.fittrack.model.filterMealsByDate
-import com.lucas.fittrack.model.sampleFoods
+
 import com.lucas.fittrack.ui.theme.components.DateSelector
 import com.lucas.fittrack.ui.theme.components.FoodDetails
 import com.lucas.fittrack.ui.theme.components.FoodList
 import com.lucas.fittrack.ui.theme.components.MealSummary
 import com.lucas.fittrack.ui.theme.components.MealTypeSelector
+import com.lucas.fittrack.ui.theme.viewmodel.HomeViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Locale
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    modifier: Modifier = Modifier
+) {
     var selectedDate by remember {
         mutableStateOf(LocalDate.now())
     }
@@ -47,9 +51,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
     val mealItems = remember {
         mutableStateListOf<MealItem>()
-    }
-    val meals = remember {
-        mutableStateListOf<Meal>()
     }
 
     var selectedFood by remember {
@@ -76,7 +77,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         )
 
         FoodList(
-            foods = sampleFoods,
+            foods = viewModel.foods,
             onFoodSelected = { food ->
                 selectedFood = food
             }
@@ -137,13 +138,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         dateTime = selectedDate.atTime(currentTime),
                         items = mealItems.toList()
                     )
-//                    val meal = Meal(
-//                        type = selectedMealType,
-//                        dateTime = LocalDateTime.now(),
-//                        items = mealItems.toList()
-//                    )
 
-                    meals.add(meal)
+                    viewModel.saveMeal(meal)
 
                     mealItems.clear()
                 }
@@ -155,8 +151,12 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Text(
             text = "Refeições salvas:"
         )
+        val mealsOfSelectedDate = filterMealsByDate(
+            meals = viewModel.meals,
+            date = selectedDate
+        )
 
-        meals.forEach { meal ->
+        mealsOfSelectedDate.forEach { meal ->
 
             Text(
                 text = meal.type.displayName
@@ -168,18 +168,11 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
-        val mealsOfSelectedDate = filterMealsByDate(
-            meals = meals,
-            date = selectedDate
-        )
+
 
         val dailyNutrients = calculateDailyNutrients(
             mealsOfSelectedDate
         )
-
-//        Text(
-//            text = "Total do dia: $selectedDate"
-//        )
 
         DateSelector(
             selectedDate = selectedDate,
