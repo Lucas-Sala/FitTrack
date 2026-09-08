@@ -6,6 +6,8 @@ import androidx.room3.Query
 import androidx.room3.Transaction
 import com.lucas.fittrack.data.local.entity.MealEntity
 import com.lucas.fittrack.data.local.entity.MealItemEntity
+import com.lucas.fittrack.data.local.relation.MealWithItems
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MealDao {
@@ -16,16 +18,10 @@ interface MealDao {
     @Insert
     suspend fun insertMealItems(items: List<MealItemEntity>)
 
-    @Query("SELECT * FROM meals")
-    suspend fun getAllMeals(): List<MealEntity>
-
-    @Query("SELECT * FROM meal_items WHERE mealId = :mealId")
-    suspend fun getItemsForMeal(mealId: Long): List<MealItemEntity>
-
     @Transaction
     suspend fun insertMealWithItems(
         meal: MealEntity,
-        items: List<MealItemEntity>
+        items: List<MealItemEntity>,
     ) {
         val mealId = insertMeal(meal)
 
@@ -35,4 +31,8 @@ interface MealDao {
 
         insertMealItems(itemsWithMealId)
     }
+
+    @Transaction
+    @Query("SELECT * FROM meals")
+    fun getMealsWithItems(): Flow<List<MealWithItems>>
 }

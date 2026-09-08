@@ -31,8 +31,7 @@ class MainActivity : ComponentActivity() {
             foodDao = database.foodDao()
         )
         val mealRepository = MealRepository(
-            mealDao = database.mealDao(),
-            foodDao = database.foodDao()
+            mealDao = database.mealDao()
         )
         val homeViewModelFactory = HomeViewModelFactory(
             foodRepository = foodRepository,

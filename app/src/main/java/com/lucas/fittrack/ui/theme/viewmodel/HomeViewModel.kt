@@ -9,37 +9,115 @@ import com.lucas.fittrack.data.repository.FoodRepository
 import com.lucas.fittrack.data.repository.MealRepository
 import com.lucas.fittrack.model.Food
 import com.lucas.fittrack.model.Meal
+import com.lucas.fittrack.model.MealItem
+import com.lucas.fittrack.model.MealType
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+
 
 class HomeViewModel(
     private val foodRepository: FoodRepository,
     private val mealRepository: MealRepository
 ) : ViewModel() {
 
-    var foods by mutableStateOf<List<Food>>(emptyList())
+    val foods = foodRepository
+        .getAllFoods()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
+    val meals = mealRepository
+        .getAllMeals()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
+    var selectedFood by mutableStateOf<Food?>(null)
         private set
 
-    var meals by mutableStateOf<List<Meal>>(emptyList())
+    var quantityText by mutableStateOf("")
+        private set
+
+    var mealItems by mutableStateOf<List<MealItem>>(emptyList())
+        private set
+
+    var selectedMealType by mutableStateOf(MealType.LUNCH)
+        private set
+
+    var selectedDate by mutableStateOf(LocalDate.now())
         private set
 
     init {
-        initializeData()
+        initializeDefaultFoods()
     }
 
-    private fun initializeData() {
+    private fun initializeDefaultFoods() {
         viewModelScope.launch {
             foodRepository.initializeDefaultFoods()
-
-            foods = foodRepository.getAllFoods()
-            meals = mealRepository.getAllMeals()
         }
     }
 
-    fun saveMeal(meal: Meal) {
+    fun selectFood(food: Food) {
+        selectedFood = food
+    }
+
+    fun updateQuantityText(value: String) {
+        quantityText = value
+    }
+
+    fun addFoodToCurrentMeal() {
+        val food = selectedFood ?: return
+
+        val quantity = quantityText.toDoubleOrNull() ?: return
+
+        if (quantity <= 0.0) {
+            return
+        }
+
+        val item = MealItem(
+            food = food,
+            quantityGrams = quantity
+        )
+
+        mealItems = mealItems + item
+    }
+
+    fun selectMealType(mealType: MealType) {
+        selectedMealType = mealType
+    }
+
+    fun selectDate(date: LocalDate) {
+        selectedDate = date
+    }
+
+    fun saveCurrentMeal() {
+
+        if (mealItems.isEmpty()) {
+            return
+        }
+
+        val currentTime = LocalDateTime.now().toLocalTime()
+
+        val meal = Meal(
+            type = selectedMealType,
+            dateTime = selectedDate.atTime(currentTime),
+            items = mealItems
+        )
+
+
         viewModelScope.launch {
             mealRepository.insertMeal(meal)
-
-            meals = mealRepository.getAllMeals()
+            mealItems = emptyList()
         }
     }
 }
+
+
+

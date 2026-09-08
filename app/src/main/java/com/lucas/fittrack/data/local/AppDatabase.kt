@@ -12,7 +12,7 @@ import com.lucas.fittrack.data.local.entity.MealItemEntity
     entities = [
         FoodEntity::class,
         MealEntity::class,
-        MealItemEntity::class
+        MealItemEntity::class,
     ],
     version = 2
 )

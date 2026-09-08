@@ -4,6 +4,8 @@ import com.lucas.fittrack.data.local.dao.FoodDao
 import com.lucas.fittrack.data.local.entity.FoodEntity
 import com.lucas.fittrack.data.mapper.toFood
 import com.lucas.fittrack.model.Food
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class FoodRepository(
     private val foodDao: FoodDao
@@ -13,11 +15,13 @@ class FoodRepository(
         foodDao.insert(food)
     }
 
-    suspend fun getAllFoods(): List<Food> {
+    fun getAllFoods(): Flow<List<Food>> {
         return foodDao
             .getAll()
-            .map { entity ->
-                entity.toFood()
+            .map { entities ->
+                entities.map { entity ->
+                    entity.toFood()
+                }
             }
     }
 
