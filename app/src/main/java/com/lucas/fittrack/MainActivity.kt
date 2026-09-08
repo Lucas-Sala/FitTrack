@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lucas.fittrack.ui.theme.FitTrackTheme
 import com.lucas.fittrack.ui.theme.screen.HomeScreen
 import com.lucas.fittrack.data.local.DatabaseProvider
+import com.lucas.fittrack.data.preferences.UserPreferencesRepository
 import com.lucas.fittrack.data.repository.FoodRepository
 import com.lucas.fittrack.data.repository.MealRepository
 import com.lucas.fittrack.ui.theme.viewmodel.HomeViewModel
@@ -33,10 +34,19 @@ class MainActivity : ComponentActivity() {
         val mealRepository = MealRepository(
             mealDao = database.mealDao()
         )
+
+        val userPreferencesRepository =
+            UserPreferencesRepository(
+                context = applicationContext
+            )
+
         val homeViewModelFactory = HomeViewModelFactory(
             foodRepository = foodRepository,
-            mealRepository = mealRepository
+            mealRepository = mealRepository,
+            userPreferencesRepository = userPreferencesRepository
         )
+
+
 
         setContent {
             FitTrackTheme {
@@ -44,6 +54,7 @@ class MainActivity : ComponentActivity() {
                 val homeViewModel: HomeViewModel = viewModel(
                     factory = homeViewModelFactory
                 )
+
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
