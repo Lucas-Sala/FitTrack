@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lucas.fittrack.model.NutritionGoals
 import com.lucas.fittrack.model.calculateDailyNutrients
 import com.lucas.fittrack.model.filterMealsByDate
+import com.lucas.fittrack.ui.theme.components.CaloriesHistoryChart
 import com.lucas.fittrack.ui.theme.components.DateSelector
 import com.lucas.fittrack.ui.theme.components.FoodDetails
 import com.lucas.fittrack.ui.theme.components.FoodList
@@ -91,6 +92,35 @@ fun HomeScreen(
 
         Text(
             text = "FitTrack"
+        )
+
+        NutritionGoalsEditor(
+            caloriesText = uiState.caloriesGoalText,
+            proteinText = uiState.proteinGoalText,
+            carbsText = uiState.carbsGoalText,
+            fatText = uiState.fatGoalText,
+
+            onCaloriesChange = { value ->
+                viewModel.updateCaloriesGoalText(value)
+            },
+
+            onProteinChange = { value ->
+                viewModel.updateProteinGoalText(value)
+            },
+
+            onCarbsChange = { value ->
+                viewModel.updateCarbsGoalText(value)
+            },
+
+            onFatChange = { value ->
+                viewModel.updateFatGoalText(value)
+            },
+
+            onSave = {
+                viewModel.saveNutritionGoals()
+            },
+
+            errorMessage = uiState.nutritionGoalsError
         )
 
         Text(
@@ -165,13 +195,6 @@ fun HomeScreen(
             }
         }
 
-        DateSelector(
-            selectedDate = uiState.selectedDate,
-            onDateChange = { newDate ->
-                viewModel.selectDate(newDate)
-            }
-        )
-
         NutrientProgress(
             name = "Calorias",
             consumed = uiState.dailyNutrients.calories,
@@ -200,33 +223,11 @@ fun HomeScreen(
             unit = "g"
         )
 
-        NutritionGoalsEditor(
-            caloriesText = uiState.caloriesGoalText,
-            proteinText = uiState.proteinGoalText,
-            carbsText = uiState.carbsGoalText,
-            fatText = uiState.fatGoalText,
-
-            onCaloriesChange = { value ->
-                viewModel.updateCaloriesGoalText(value)
-            },
-
-            onProteinChange = { value ->
-                viewModel.updateProteinGoalText(value)
-            },
-
-            onCarbsChange = { value ->
-                viewModel.updateCarbsGoalText(value)
-            },
-
-            onFatChange = { value ->
-                viewModel.updateFatGoalText(value)
-            },
-
-            onSave = {
-                viewModel.saveNutritionGoals()
-            },
-
-            errorMessage = uiState.nutritionGoalsError
+        DateSelector(
+            selectedDate = uiState.selectedDate,
+            onDateChange = { newDate ->
+                viewModel.selectDate(newDate)
+            }
         )
 
         HistoryPeriodSelector(
@@ -236,17 +237,25 @@ fun HomeScreen(
             }
         )
         Text(
-            text = "Histórico nutricional"
+            text = "Histórico de calorias"
         )
 
-        uiState.nutritionHistory.forEach { day ->
+        CaloriesHistoryChart(
+            history = uiState.nutritionHistory,
+            calorieGoal = uiState.nutritionGoals.calories
+        )
+//        CaloriesHistoryChart(
+//            history = emptyList()
+//        )
 
-            Text(
-                text = "${day.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} - " +
-                        "${String.format("%.0f", day.nutrients.calories)} kcal - " +
-                        "${String.format("%.1f", day.nutrients.protein)} g proteína"
-            )
-        }
+//        uiState.nutritionHistory.forEach { day ->
+//
+//            Text(
+//                text = "${day.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} - " +
+//                        "${String.format("%.0f", day.nutrients.calories)} kcal - " +
+//                        "${String.format("%.1f", day.nutrients.protein)} g proteína"
+//            )
+//        }
     }
 
 
