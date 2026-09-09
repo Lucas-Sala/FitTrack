@@ -1,5 +1,7 @@
 package com.lucas.fittrack.ui.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -29,15 +31,13 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.Fill
 import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CaloriesHistoryChart(
     history: List<DailyNutrition>,
     calorieGoal: Double,
     modifier: Modifier = Modifier
 ) {
-//    if (history.isEmpty()) {
-//        return
-//    }
 
     val modelProducer = remember {
         CartesianChartModelProducer()
@@ -114,8 +114,7 @@ fun CaloriesHistoryChart(
     }
 
     val markerGuideline = rememberAxisGuidelineComponent(
-        Fill(MaterialTheme.colorScheme.onSurface),
-        thickness = 2.dp
+        Fill(MaterialTheme.colorScheme.onSurface)
     )
 
     /*
@@ -217,7 +216,9 @@ fun CaloriesHistoryChart(
         y = {
             calorieGoal
         },
-        line = rememberAxisGuidelineComponent(),
+        line = rememberAxisGuidelineComponent(
+            Fill(MaterialTheme.colorScheme.onSurface)
+        ),
         labelComponent = rememberAxisLabelComponent(
             TextStyle(MaterialTheme.colorScheme.onSurface)
         ),

@@ -2,11 +2,14 @@ package com.lucas.fittrack.ui.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import com.lucas.fittrack.model.Food
 import com.lucas.fittrack.model.calculateNutrients
@@ -28,9 +31,9 @@ fun FoodDetails(
 
     Column {
         Text(
-            text = "Selecionado: ${food.name}"
+            text = food.name,
+            style = MaterialTheme.typography.titleSmall
         )
-
         OutlinedTextField(
             value = quantityText,
             onValueChange = { newValue ->
@@ -61,7 +64,8 @@ fun FoodDetails(
         )
 
         Button(
-            onClick = onAdd
+            onClick = onAdd,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("Adicionar à refeição")
         }

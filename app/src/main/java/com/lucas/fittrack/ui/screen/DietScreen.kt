@@ -1,10 +1,18 @@
 package com.lucas.fittrack.ui.screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,8 +27,11 @@ import com.lucas.fittrack.ui.components.FoodDetails
 import com.lucas.fittrack.ui.components.FoodList
 import com.lucas.fittrack.ui.components.MealSummary
 import com.lucas.fittrack.ui.components.MealTypeSelector
+import com.lucas.fittrack.ui.components.SectionCard
+import com.lucas.fittrack.ui.theme.Dimens
 import com.lucas.fittrack.ui.viewmodel.HomeViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DietScreen(
     viewModel: HomeViewModel,
@@ -34,61 +45,133 @@ fun DietScreen(
 
     Column(
         modifier = modifier
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(Dimens.screenPadding),
+        verticalArrangement = Arrangement.spacedBy(
+            Dimens.spacingLarge
+        )
     ) {
-        Text("Dieta")
+
+        Text(
+            text = "Dieta",
+            style = MaterialTheme.typography.headlineLarge
+        )
 
         DateSelector(
             selectedDate = uiState.selectedDate,
-            onDateChange = { newDate ->
-                viewModel.selectDate(newDate)
-            }
+            onDateChange = viewModel::selectDate
         )
 
-        Text("Selecione um alimento")
+        SectionCard {
 
-        FoodList(
-            foods = uiState.foods,
-            onFoodSelected = { food ->
-                viewModel.selectFood(food)
-            }
-        )
+            Text(
+                text = "Selecionar alimento",
+                style = MaterialTheme.typography.titleMedium
+            )
 
-        uiState.selectedFood?.let { food ->
-            FoodDetails(
-                food = food,
-                quantityText = uiState.quantityText,
-                onQuantityChange = { value ->
-                    viewModel.updateQuantityText(value)
-                },
-                onAdd = {
-                    viewModel.addFoodToCurrentMeal()
+            Spacer(
+                modifier = Modifier.height(
+                    Dimens.spacingMedium
+                )
+            )
+
+            FoodList(
+                foods = uiState.foods,
+                onFoodSelected = { food ->
+                    viewModel.selectFood(food)
                 }
             )
         }
 
-        MealTypeSelector(
-            selectedMealType = uiState.selectedMealType,
-            expanded = mealTypeMenuExpanded,
-            onExpandedChange = { expanded ->
-                mealTypeMenuExpanded = expanded
-            },
-            onMealTypeSelected = { mealType ->
-                viewModel.selectMealType(mealType)
-            }
-        )
+        uiState.selectedFood?.let { food ->
 
-        MealSummary(
-            mealItems = uiState.mealItems
-        )
+            SectionCard {
 
-        Button(
-            onClick = {
-                viewModel.saveCurrentMeal()
+                Text(
+                    text = "Alimento selecionado",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Spacer(
+                    modifier = Modifier.height(
+                        Dimens.spacingMedium
+                    )
+                )
+
+                FoodDetails(
+                    food = food,
+                    quantityText = uiState.quantityText,
+
+                    onQuantityChange = { value ->
+                        viewModel.updateQuantityText(value)
+                    },
+
+                    onAdd = {
+                        viewModel.addFoodToCurrentMeal()
+                    }
+                )
             }
-        ) {
-            Text("Salvar refeição")
+        }
+
+        SectionCard {
+
+            Text(
+                text = "Refeição atual",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(
+                modifier = Modifier.height(
+                    Dimens.spacingMedium
+                )
+            )
+
+            MealSummary(
+                mealItems = uiState.mealItems
+            )
+        }
+
+        SectionCard {
+
+            Text(
+                text = "Tipo da refeição",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(
+                modifier = Modifier.height(
+                    Dimens.spacingMedium
+                )
+            )
+
+            MealTypeSelector(
+                selectedMealType = uiState.selectedMealType,
+                expanded = mealTypeMenuExpanded,
+
+                onExpandedChange = { expanded ->
+                    mealTypeMenuExpanded = expanded
+                },
+
+                onMealTypeSelected = { mealType ->
+                    viewModel.selectMealType(mealType)
+                }
+            )
+
+            Spacer(
+                modifier = Modifier.height(
+                    Dimens.spacingLarge
+                )
+            )
+
+            Button(
+                onClick = {
+                    viewModel.saveCurrentMeal()
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Salvar refeição")
+            }
         }
     }
 }
