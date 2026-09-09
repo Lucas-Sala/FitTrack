@@ -4,21 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lucas.fittrack.ui.theme.FitTrackTheme
-import com.lucas.fittrack.ui.theme.screen.HomeScreen
 import com.lucas.fittrack.data.local.DatabaseProvider
 import com.lucas.fittrack.data.preferences.UserPreferencesRepository
 import com.lucas.fittrack.data.repository.FoodRepository
 import com.lucas.fittrack.data.repository.MealRepository
-import com.lucas.fittrack.ui.theme.viewmodel.HomeViewModel
-import com.lucas.fittrack.ui.theme.viewmodel.HomeViewModelFactory
+import com.lucas.fittrack.ui.FitTrackApp
+import com.lucas.fittrack.ui.viewmodel.HomeViewModel
+import com.lucas.fittrack.ui.viewmodel.HomeViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
@@ -51,29 +45,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             FitTrackTheme {
 
-                val homeViewModel: HomeViewModel = viewModel(
-                    factory = homeViewModelFactory
-                )
-
-
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-
-                    HomeScreen(
-                        viewModel = homeViewModel,
-                        modifier = Modifier.padding(innerPadding)
+                val homeViewModel: HomeViewModel =
+                    viewModel(
+                        factory = homeViewModelFactory
                     )
-                }
+
+                FitTrackApp(
+                    viewModel = homeViewModel
+                )
             }
         }
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun FitTrackPreview() {
-//    FitTrackTheme {
-//        HomeScreen()
-//    }
-//}

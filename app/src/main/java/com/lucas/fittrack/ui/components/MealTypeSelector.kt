@@ -1,4 +1,4 @@
-package com.lucas.fittrack.ui.theme.components
+package com.lucas.fittrack.ui.components
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu

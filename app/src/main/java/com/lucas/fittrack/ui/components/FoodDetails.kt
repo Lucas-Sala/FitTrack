@@ -1,4 +1,4 @@
-package com.lucas.fittrack.ui.theme.components
+package com.lucas.fittrack.ui.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column

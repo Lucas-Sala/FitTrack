@@ -1,4 +1,4 @@
-package com.lucas.fittrack.ui.theme.viewmodel
+package com.lucas.fittrack.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

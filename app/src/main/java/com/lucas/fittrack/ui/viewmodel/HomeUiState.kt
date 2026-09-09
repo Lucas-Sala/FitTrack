@@ -1,4 +1,4 @@
-package com.lucas.fittrack.ui.theme.viewmodel
+package com.lucas.fittrack.ui.viewmodel
 
 import com.lucas.fittrack.model.DailyNutrition
 import com.lucas.fittrack.model.Food

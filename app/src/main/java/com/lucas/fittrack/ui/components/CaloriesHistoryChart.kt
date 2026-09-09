@@ -1,4 +1,4 @@
-package com.lucas.fittrack.ui.theme.components
+package com.lucas.fittrack.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +26,7 @@ import com.patrykandpatrick.vico.compose.cartesian.marker.LineCartesianLayerMark
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.common.Fill
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -34,12 +35,40 @@ fun CaloriesHistoryChart(
     calorieGoal: Double,
     modifier: Modifier = Modifier
 ) {
-    if (history.isEmpty()) {
-        return
-    }
+//    if (history.isEmpty()) {
+//        return
+//    }
 
     val modelProducer = remember {
         CartesianChartModelProducer()
+    }
+
+    /*
+     * Atualiza os dados sem recriar o producer.
+     */
+    LaunchedEffect(history) {
+        if (history.isEmpty()) return@LaunchedEffect
+
+        val xValues = history.indices.map { index ->
+            index
+        }
+
+        val calories = history.map { day ->
+            day.nutrients.calories
+        }
+
+        modelProducer.runTransaction {
+            lineModel {
+                series(
+                    x = xValues,
+                    y = calories
+                )
+            }
+        }
+    }
+
+    if (history.isEmpty()) {
+        return
     }
 
     val dateFormatter = remember {
@@ -84,6 +113,11 @@ fun CaloriesHistoryChart(
         }
     }
 
+    val markerGuideline = rememberAxisGuidelineComponent(
+        Fill(MaterialTheme.colorScheme.onSurface),
+        thickness = 2.dp
+    )
+
     /*
      * Garante que a meta esteja dentro da faixa
      * vertical do gráfico.
@@ -107,29 +141,6 @@ fun CaloriesHistoryChart(
     val lineLayer = rememberLineCartesianLayer(
         rangeProvider = rangeProvider
     )
-
-    /*
-     * Atualiza os dados sem recriar o producer.
-     */
-    LaunchedEffect(history) {
-
-        val xValues = history.indices.map { index ->
-            index
-        }
-
-        val calories = history.map { day ->
-            day.nutrients.calories
-        }
-
-        modelProducer.runTransaction {
-            lineModel {
-                series(
-                    x = xValues,
-                    y = calories
-                )
-            }
-        }
-    }
 
     val bottomAxis = HorizontalAxis.rememberBottom(
         valueFormatter = bottomAxisValueFormatter,
@@ -194,8 +205,10 @@ fun CaloriesHistoryChart(
             TextStyle(MaterialTheme.colorScheme.onSurface)
         ),
         valueFormatter = markerValueFormatter,
-        guideline = rememberAxisGuidelineComponent()
+        guideline = markerGuideline
     )
+
+
 
     /*
      * Linha horizontal da meta.

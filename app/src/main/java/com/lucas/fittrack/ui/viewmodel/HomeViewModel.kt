@@ -1,8 +1,5 @@
-package com.lucas.fittrack.ui.theme.viewmodel
+package com.lucas.fittrack.ui.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lucas.fittrack.data.preferences.UserPreferencesRepository
@@ -23,7 +20,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.combine
 
