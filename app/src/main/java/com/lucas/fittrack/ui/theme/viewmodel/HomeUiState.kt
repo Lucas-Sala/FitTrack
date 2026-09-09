@@ -1,6 +1,8 @@
 package com.lucas.fittrack.ui.theme.viewmodel
 
+import com.lucas.fittrack.model.DailyNutrition
 import com.lucas.fittrack.model.Food
+import com.lucas.fittrack.model.HistoryPeriod
 import com.lucas.fittrack.model.Meal
 import com.lucas.fittrack.model.MealItem
 import com.lucas.fittrack.model.MealType
@@ -34,5 +36,8 @@ data class HomeUiState(
     val carbsGoalText: String = "",
     val fatGoalText: String = "",
 
-    val nutritionGoalsError: String? = null
+    val nutritionGoalsError: String? = null,
+
+    val nutritionHistory: List<DailyNutrition> = emptyList(),
+    val historyPeriod: HistoryPeriod = HistoryPeriod.SEVEN_DAYS
 )

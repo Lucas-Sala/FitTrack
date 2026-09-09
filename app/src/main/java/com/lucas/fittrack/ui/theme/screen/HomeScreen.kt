@@ -25,10 +25,12 @@ import com.lucas.fittrack.model.filterMealsByDate
 import com.lucas.fittrack.ui.theme.components.DateSelector
 import com.lucas.fittrack.ui.theme.components.FoodDetails
 import com.lucas.fittrack.ui.theme.components.FoodList
+import com.lucas.fittrack.ui.theme.components.HistoryPeriodSelector
 import com.lucas.fittrack.ui.theme.components.MealSummary
 import com.lucas.fittrack.ui.theme.components.MealTypeSelector
 import com.lucas.fittrack.ui.theme.components.NutritionGoalsEditor
 import com.lucas.fittrack.ui.theme.viewmodel.HomeViewModel
+import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -226,6 +228,25 @@ fun HomeScreen(
 
             errorMessage = uiState.nutritionGoalsError
         )
+
+        HistoryPeriodSelector(
+            selectedPeriod = uiState.historyPeriod,
+            onPeriodSelected = { period ->
+                viewModel.selectHistoryPeriod(period)
+            }
+        )
+        Text(
+            text = "Histórico nutricional"
+        )
+
+        uiState.nutritionHistory.forEach { day ->
+
+            Text(
+                text = "${day.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} - " +
+                        "${String.format("%.0f", day.nutrients.calories)} kcal - " +
+                        "${String.format("%.1f", day.nutrients.protein)} g proteína"
+            )
+        }
     }
 
 

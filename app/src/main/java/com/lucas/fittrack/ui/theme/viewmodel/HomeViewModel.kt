@@ -9,11 +9,13 @@ import com.lucas.fittrack.data.preferences.UserPreferencesRepository
 import com.lucas.fittrack.data.repository.FoodRepository
 import com.lucas.fittrack.data.repository.MealRepository
 import com.lucas.fittrack.model.Food
+import com.lucas.fittrack.model.HistoryPeriod
 import com.lucas.fittrack.model.Meal
 import com.lucas.fittrack.model.MealItem
 import com.lucas.fittrack.model.MealType
 import com.lucas.fittrack.model.NutritionGoals
 import com.lucas.fittrack.model.calculateDailyNutrients
+import com.lucas.fittrack.model.calculateNutritionHistory
 import com.lucas.fittrack.model.filterMealsByDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -50,6 +52,19 @@ class HomeViewModel(
                 date = editableState.selectedDate
             )
 
+            val historyEndDate = editableState.selectedDate
+
+            val historyStartDate = historyEndDate.minusDays(
+                editableState.historyPeriod.days - 1
+            )
+
+            val nutritionHistory = calculateNutritionHistory(
+                meals = meals,
+                startDate = historyStartDate,
+                endDate = historyEndDate
+            )
+
+
             val dailyNutrients = calculateDailyNutrients(
                 mealsOfSelectedDate
             )
@@ -59,7 +74,8 @@ class HomeViewModel(
                 meals = meals,
                 mealsOfSelectedDate = mealsOfSelectedDate,
                 dailyNutrients = dailyNutrients,
-                nutritionGoals = nutritionGoals
+                nutritionGoals = nutritionGoals,
+                nutritionHistory = nutritionHistory
             )
         }
         .stateIn(
@@ -68,24 +84,24 @@ class HomeViewModel(
             initialValue = HomeUiState()
         )
 
-    val foods = foodRepository
-        .getAllFoods()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    val meals = mealRepository
-        .getAllMeals()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    var mealItems by mutableStateOf<List<MealItem>>(emptyList())
-        private set
+//    val foods = foodRepository
+//        .getAllFoods()
+//        .stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.WhileSubscribed(5_000),
+//            initialValue = emptyList()
+//        )
+//
+//    val meals = mealRepository
+//        .getAllMeals()
+//        .stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.WhileSubscribed(5_000),
+//            initialValue = emptyList()
+//        )
+//
+//    var mealItems by mutableStateOf<List<MealItem>>(emptyList())
+//        private set
 
     private var goalsInitialized = false
 
@@ -112,11 +128,11 @@ class HomeViewModel(
         }
     }
 
-    private fun initializeDefaultFoods() {
-        viewModelScope.launch {
-            foodRepository.initializeDefaultFoods()
-        }
-    }
+//    private fun initializeDefaultFoods() {
+//        viewModelScope.launch {
+//            foodRepository.initializeDefaultFoods()
+//        }
+//    }
 
     fun selectFood(food: Food) {
         _editableState.value = _editableState.value.copy(
@@ -284,6 +300,12 @@ class HomeViewModel(
                 fatGoalText = value,
                 nutritionGoalsError = null
             )
+    }
+
+    fun selectHistoryPeriod(period: HistoryPeriod) {
+        _editableState.value = _editableState.value.copy(
+            historyPeriod = period
+        )
     }
 }
 
