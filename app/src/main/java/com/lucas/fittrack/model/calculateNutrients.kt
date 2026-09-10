@@ -11,6 +11,9 @@ fun calculateNutrients(
         calories = food.caloriesPer100g * factor,
         protein = food.proteinPer100g * factor,
         carbs = food.carbsPer100g * factor,
-        fat = food.fatPer100g * factor
+        fat = food.fatPer100g * factor,
+
+        fiber = food.fiberPer100g * factor,
+        cholesterol = food.cholesterolPer100g * factor
     )
 }

@@ -3,6 +3,7 @@ package com.lucas.fittrack.ui.screen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,7 +40,9 @@ import com.lucas.fittrack.ui.viewmodel.HomeViewModel
 @Composable
 fun DietScreen(
     viewModel: HomeViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSearchTextChange: (String) -> Unit,
+    onCategorySelected: (String?) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -68,6 +75,20 @@ fun DietScreen(
             Text(
                 text = "Selecionar alimento",
                 style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(
+                modifier = Modifier.height(
+                    Dimens.spacingMedium
+                )
+            )
+
+            FoodSearchSection(
+                searchText = uiState.foodSearchText,
+                categories = uiState.foodCategories,
+                selectedCategory = uiState.selectedFoodCategory,
+                onSearchTextChange = onSearchTextChange,
+                onCategorySelected = onCategorySelected
             )
 
             Spacer(
@@ -171,6 +192,91 @@ fun DietScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Salvar refeição")
+            }
+        }
+    }
+}
+
+@Composable
+fun FoodSearchSection(
+    searchText: String,
+    categories: List<String>,
+    selectedCategory: String?,
+    onSearchTextChange: (String) -> Unit,
+    onCategorySelected: (String?) -> Unit
+) {
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(
+            Dimens.spacingMedium
+        )
+    ) {
+
+        OutlinedTextField(
+            value = searchText,
+            onValueChange = onSearchTextChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text("Buscar alimento")
+            },
+            singleLine = true
+        )
+
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            OutlinedButton(
+                onClick = {
+                    expanded = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = selectedCategory
+                        ?: "Todas as categorias"
+                )
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                }
+            ) {
+
+                DropdownMenuItem(
+                    modifier = Modifier.height(30.dp),
+                    text = {
+                        Text(
+                            text = "Todas as categorias",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
+                    onClick = {
+                        onCategorySelected(null)
+                        expanded = false
+                    }
+                )
+
+                categories.forEach { category ->
+                    DropdownMenuItem(
+                        modifier = Modifier.height(36.dp),
+                        text = {
+                            Text(
+                                text = category,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        },
+                        onClick = {
+                            onCategorySelected(category)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }

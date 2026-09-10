@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-//import androidx.compose.material3.R
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,8 +24,6 @@ import com.lucas.fittrack.ui.screen.HomeScreen
 import com.lucas.fittrack.ui.screen.SettingsScreen
 import com.lucas.fittrack.ui.viewmodel.HomeViewModel
 import com.lucas.fittrack.R
-import androidx.compose.material3.Icon
-import androidx.compose.ui.res.painterResource
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -126,7 +123,9 @@ fun FitTrackApp(
 
             composable(AppDestination.Diet.route) {
                 DietScreen(
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    onSearchTextChange = viewModel::updateFoodSearchText,
+                    onCategorySelected = viewModel::selectFoodCategory
                 )
             }
 

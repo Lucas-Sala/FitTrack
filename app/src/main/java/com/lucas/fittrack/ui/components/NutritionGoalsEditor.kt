@@ -19,15 +19,19 @@ fun NutritionGoalsEditor(
     proteinText: String,
     carbsText: String,
     fatText: String,
+    fiberText: String,
 
     onCaloriesChange: (String) -> Unit,
     onProteinChange: (String) -> Unit,
     onCarbsChange: (String) -> Unit,
     onFatChange: (String) -> Unit,
+    onFiberChange: (String) -> Unit,
 
     onSave: () -> Unit,
 
     errorMessage: String?
+
+
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(
@@ -88,6 +92,22 @@ fun NutritionGoalsEditor(
             onValueChange = onFatChange,
             label = {
                 Text("Gorduras")
+            },
+            suffix = {
+                Text("g")
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal
+            ),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = fiberText,
+            onValueChange = onFiberChange,
+            label = {
+                Text("Fibras")
             },
             suffix = {
                 Text("g")

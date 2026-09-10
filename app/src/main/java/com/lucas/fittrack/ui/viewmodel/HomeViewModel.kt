@@ -1,7 +1,10 @@
 package com.lucas.fittrack.ui.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lucas.fittrack.data.local.importer.TacoImporter
 import com.lucas.fittrack.data.preferences.UserPreferencesRepository
 import com.lucas.fittrack.data.repository.FoodRepository
 import com.lucas.fittrack.data.repository.MealRepository
@@ -10,6 +13,7 @@ import com.lucas.fittrack.model.HistoryPeriod
 import com.lucas.fittrack.model.Meal
 import com.lucas.fittrack.model.MealItem
 import com.lucas.fittrack.model.MealType
+import com.lucas.fittrack.model.NutritionChartMetric
 import com.lucas.fittrack.model.NutritionGoals
 import com.lucas.fittrack.model.calculateDailyNutrients
 import com.lucas.fittrack.model.calculateNutritionHistory
@@ -22,26 +26,46 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 class HomeViewModel(
     private val foodRepository: FoodRepository,
     private val mealRepository: MealRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val tacoImporter: TacoImporter
 ) : ViewModel() {
-
     private val _editableState = MutableStateFlow(
         HomeUiState()
     )
 
+    private val filteredFoods =
+        _editableState
+            .map { state ->
+                state.foodSearchText to state.selectedFoodCategory
+            }
+            .distinctUntilChanged()
+            .flatMapLatest { (query, category) ->
+                foodRepository.searchFoods(
+                    query = query.trim(),
+                    category = category
+                )
+            }
+
+    private val foodCategories =
+        foodRepository.getCategories()
+
     val uiState: StateFlow<HomeUiState> =
         combine(
-            foodRepository.getAllFoods(),
+            filteredFoods,
+            foodCategories,
             mealRepository.getAllMeals(),
             _editableState,
             userPreferencesRepository.nutritionGoals
-        ) { foods, meals, editableState, nutritionGoals ->
+        ) { foods, categories, meals, editableState, nutritionGoals ->
 
             val mealsOfSelectedDate = filterMealsByDate(
                 meals = meals,
@@ -60,13 +84,13 @@ class HomeViewModel(
                 endDate = historyEndDate
             )
 
-
             val dailyNutrients = calculateDailyNutrients(
                 mealsOfSelectedDate
             )
 
             editableState.copy(
                 foods = foods,
+                foodCategories = categories,
                 meals = meals,
                 mealsOfSelectedDate = mealsOfSelectedDate,
                 dailyNutrients = dailyNutrients,
@@ -74,36 +98,17 @@ class HomeViewModel(
                 nutritionHistory = nutritionHistory
             )
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = HomeUiState()
-        )
-
-//    val foods = foodRepository
-//        .getAllFoods()
-//        .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(5_000),
-//            initialValue = emptyList()
-//        )
-//
-//    val meals = mealRepository
-//        .getAllMeals()
-//        .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(5_000),
-//            initialValue = emptyList()
-//        )
-//
-//    var mealItems by mutableStateOf<List<MealItem>>(emptyList())
-//        private set
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = HomeUiState()
+            )
 
     private var goalsInitialized = false
 
     init {
         viewModelScope.launch {
-            foodRepository.initializeDefaultFoods()
+            tacoImporter.importIfNeeded()
         }
 
         viewModelScope.launch {
@@ -115,7 +120,8 @@ class HomeViewModel(
                             caloriesGoalText = goals.calories.toString(),
                             proteinGoalText = goals.protein.toString(),
                             carbsGoalText = goals.carbs.toString(),
-                            fatGoalText = goals.fat.toString()
+                            fatGoalText = goals.fat.toString(),
+                            fiberGoalText = goals.fiber.toString()
                         )
 
                     goalsInitialized = true
@@ -124,11 +130,6 @@ class HomeViewModel(
         }
     }
 
-//    private fun initializeDefaultFoods() {
-//        viewModelScope.launch {
-//            foodRepository.initializeDefaultFoods()
-//        }
-//    }
 
     fun selectFood(food: Food) {
         _editableState.value = _editableState.value.copy(
@@ -219,11 +220,15 @@ class HomeViewModel(
         val fat =
             state.fatGoalText.toDoubleOrNull()
 
+        val fiber =
+            state.fiberGoalText.toDoubleOrNull()
+
         if (
             calories == null ||
             protein == null ||
             carbs == null ||
-            fat == null
+            fat == null ||
+            fiber == null
         ) {
             _editableState.value =
                 state.copy(
@@ -238,7 +243,8 @@ class HomeViewModel(
             calories <= 0.0 ||
             protein <= 0.0 ||
             carbs <= 0.0 ||
-            fat <= 0.0
+            fat <= 0.0 ||
+            fiber <= 0.0
         ) {
             _editableState.value =
                 state.copy(
@@ -253,7 +259,8 @@ class HomeViewModel(
             calories = calories,
             protein = protein,
             carbs = carbs,
-            fat = fat
+            fat = fat,
+            fiber = fiber
         )
 
         viewModelScope.launch {
@@ -298,10 +305,41 @@ class HomeViewModel(
             )
     }
 
+    fun updateFiberGoalText(value: String) {
+        _editableState.value =
+            _editableState.value.copy(
+                fiberGoalText = value,
+                nutritionGoalsError = null
+            )
+    }
+
     fun selectHistoryPeriod(period: HistoryPeriod) {
         _editableState.value = _editableState.value.copy(
             historyPeriod = period
         )
+    }
+
+    fun updateFoodSearchText(value: String) {
+        _editableState.value =
+            _editableState.value.copy(
+                foodSearchText = value
+            )
+    }
+
+    fun selectFoodCategory(category: String?) {
+        _editableState.value =
+            _editableState.value.copy(
+                selectedFoodCategory = category
+            )
+    }
+
+    fun selectNutritionChartMetric(
+        metric: NutritionChartMetric
+    ) {
+        _editableState.value =
+            _editableState.value.copy(
+                nutritionChartMetric = metric
+            )
     }
 }
 

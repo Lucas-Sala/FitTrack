@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -83,6 +84,25 @@ fun DailySummaryCard(
                     goal = goals.fat
                 )
             }
+
+            HorizontalDivider()
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                NutrientSummary(
+                    name = "Fibras",
+                    value = nutrients.fiber,
+                    goal = goals.fiber
+                )
+
+                SimpleNutrientSummary(
+                    name = "Colesterol",
+                    value = nutrients.cholesterol,
+                    unit = "mg"
+                )
+            }
         }
     }
 }
@@ -101,6 +121,25 @@ private fun NutrientSummary(
 
         Text(
             text = "${value.toInt()} / ${goal.toInt()} g",
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun SimpleNutrientSummary(
+    name: String,
+    value: Double,
+    unit: String
+) {
+    Column {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.labelMedium
+        )
+
+        Text(
+            text = "${value.toInt()} $unit",
             style = MaterialTheme.typography.bodyMedium
         )
     }

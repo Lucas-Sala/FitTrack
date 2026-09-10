@@ -63,6 +63,14 @@ fun FoodDetails(
             text = "Gorduras: ${String.format("%.2f", nutrients.fat)} g"
         )
 
+        Text(
+            text = "Fibras: ${String.format("%.2f", nutrients.fiber)} g"
+        )
+
+        Text(
+            text = "Colesterol: ${String.format("%.2f", nutrients.cholesterol)} mg"
+        )
+
         Button(
             onClick = onAdd,
             modifier = Modifier.fillMaxWidth()

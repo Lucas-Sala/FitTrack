@@ -43,6 +43,14 @@ fun MealSummary(
         Text(
             text = "Gorduras: ${String.format("%.2f", mealNutrients.fat)} g"
         )
+
+        Text(
+            text = "Fibras: ${String.format("%.2f", mealNutrients.fiber)} g"
+        )
+
+        Text(
+            text = "Colesterol: ${String.format("%.2f", mealNutrients.cholesterol)} mg"
+        )
     }
 }
 

@@ -39,10 +39,26 @@ fun calculateMealNutrients(
         ).fat
     }
 
+    val totalFiber = mealItems.sumOf { item ->
+        calculateNutrients(
+            food = item.food,
+            quantityGrams = item.quantityGrams
+        ).fiber
+    }
+
+    val totalCholesterol = mealItems.sumOf { item ->
+        calculateNutrients(
+            food = item.food,
+            quantityGrams = item.quantityGrams
+        ).cholesterol
+    }
+
     return Nutrients(
         calories = totalCalories,
         protein = totalProtein,
         carbs = totalCarbs,
-        fat = totalFat
+        fat = totalFat,
+        fiber = totalFiber,
+        cholesterol = totalCholesterol
     )
 }

@@ -16,7 +16,11 @@ object DatabaseProvider {
                 context.applicationContext,
                 AppDatabase::class.java,
                 "fittrack_database"
-            ).build()
+            )
+                .fallbackToDestructiveMigration(
+                    dropAllTables = true
+                )
+                .build()
 
             INSTANCE = instance
 

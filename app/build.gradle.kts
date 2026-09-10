@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.vico.compose)
     implementation(libs.vico.compose.m3)
+    implementation("org.apache.commons:commons-csv:1.14.0")
 
     ksp(libs.androidx.room.compiler)
 

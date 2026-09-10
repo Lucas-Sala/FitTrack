@@ -1,7 +1,10 @@
 package com.lucas.fittrack.ui.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.lucas.fittrack.data.local.importer.TacoImporter
 import com.lucas.fittrack.data.preferences.UserPreferencesRepository
 import com.lucas.fittrack.data.repository.FoodRepository
 import com.lucas.fittrack.data.repository.MealRepository
@@ -9,9 +12,11 @@ import com.lucas.fittrack.data.repository.MealRepository
 class HomeViewModelFactory(
     private val foodRepository: FoodRepository,
     private val mealRepository: MealRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val tacoImporter: TacoImporter
 ) : ViewModelProvider.Factory {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(
         modelClass: Class<T>
@@ -21,10 +26,10 @@ class HomeViewModelFactory(
             return HomeViewModel(
                 foodRepository = foodRepository,
                 mealRepository = mealRepository,
-                userPreferencesRepository = userPreferencesRepository
+                userPreferencesRepository = userPreferencesRepository,
+                tacoImporter = tacoImporter
             ) as T
         }
-
 
         throw IllegalArgumentException("Unknown ViewModel class")
     }

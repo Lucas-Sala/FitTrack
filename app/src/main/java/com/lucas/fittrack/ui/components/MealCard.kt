@@ -84,6 +84,13 @@ fun MealCard(
                             "Gor: ${nutrients.fat.toInt()} g",
                 style = MaterialTheme.typography.labelMedium
             )
+            Text(
+                text =
+                    "Fibra: ${String.format("%.1f", nutrients.fiber)} g  •  " +
+                            "Colesterol: ${String.format("%.0f", nutrients.cholesterol)} mg",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

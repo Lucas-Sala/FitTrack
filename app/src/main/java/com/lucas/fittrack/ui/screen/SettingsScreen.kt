@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lucas.fittrack.ui.components.NutritionGoalsEditor
 import com.lucas.fittrack.ui.components.SectionCard
@@ -66,6 +65,7 @@ fun SettingsScreen(
                 proteinText = uiState.proteinGoalText,
                 carbsText = uiState.carbsGoalText,
                 fatText = uiState.fatGoalText,
+                fiberText = uiState.fiberGoalText,
 
                 onCaloriesChange = {
                     viewModel.updateCaloriesGoalText(it)
@@ -81,6 +81,10 @@ fun SettingsScreen(
 
                 onFatChange = {
                     viewModel.updateFatGoalText(it)
+                },
+
+                onFiberChange = {
+                    viewModel.updateFiberGoalText(it)
                 },
 
                 onSave = {

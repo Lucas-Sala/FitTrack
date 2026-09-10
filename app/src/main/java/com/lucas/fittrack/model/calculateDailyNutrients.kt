@@ -20,10 +20,20 @@ fun calculateDailyNutrients(
         calculateMealNutrients(meal).fat
     }
 
+    val totalFiber = meals.sumOf { meal ->
+        calculateMealNutrients(meal).fiber
+    }
+
+    val totalCholesterol = meals.sumOf { meal ->
+        calculateMealNutrients(meal).cholesterol
+    }
+
     return Nutrients(
         calories = totalCalories,
         protein = totalProtein,
         carbs = totalCarbs,
-        fat = totalFat
+        fat = totalFat,
+        fiber = totalFiber,
+        cholesterol = totalCholesterol
     )
 }

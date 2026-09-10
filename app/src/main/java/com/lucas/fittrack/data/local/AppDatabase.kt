@@ -14,7 +14,7 @@ import com.lucas.fittrack.data.local.entity.MealItemEntity
         MealEntity::class,
         MealItemEntity::class,
     ],
-    version = 2
+    version = 4
 )
 abstract class AppDatabase : RoomDatabase() {
 

@@ -21,6 +21,7 @@ class UserPreferencesRepository(
         val PROTEIN_GOAL = doublePreferencesKey("protein_goal")
         val CARBS_GOAL = doublePreferencesKey("carbs_goal")
         val FAT_GOAL = doublePreferencesKey("fat_goal")
+        val FIBER_GOAL = doublePreferencesKey("fiber_goal")
     }
 
     val nutritionGoals: Flow<NutritionGoals> =
@@ -30,7 +31,8 @@ class UserPreferencesRepository(
                 calories = preferences[Keys.CALORIES_GOAL] ?: 2750.0,
                 protein = preferences[Keys.PROTEIN_GOAL] ?: 180.0,
                 carbs = preferences[Keys.CARBS_GOAL] ?: 320.0,
-                fat = preferences[Keys.FAT_GOAL] ?: 80.0
+                fat = preferences[Keys.FAT_GOAL] ?: 80.0,
+                fiber = preferences[Keys.FIBER_GOAL] ?: 100.0
             )
         }
 
@@ -43,6 +45,7 @@ class UserPreferencesRepository(
             preferences[Keys.PROTEIN_GOAL] = goals.protein
             preferences[Keys.CARBS_GOAL] = goals.carbs
             preferences[Keys.FAT_GOAL] = goals.fat
+            preferences[Keys.FIBER_GOAL] = goals.fiber
         }
     }
 }
