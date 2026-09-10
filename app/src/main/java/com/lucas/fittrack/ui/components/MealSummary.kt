@@ -1,56 +1,175 @@
 package com.lucas.fittrack.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import com.lucas.fittrack.model.MealItem
 import com.lucas.fittrack.model.calculateMealNutrients
-import kotlin.collections.forEach
+import com.lucas.fittrack.ui.theme.Dimens
+import java.util.Locale
 
 @Composable
 fun MealSummary(
     mealItems: List<MealItem>
 ) {
-    val mealNutrients = calculateMealNutrients(mealItems)
+    val mealNutrients =
+        calculateMealNutrients(mealItems)
 
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(
+            Dimens.spacingMedium
+        )
+    ) {
+
         Text(
-            text = "Itens da refeição:"
+            text = "Itens da refeição",
+            style = MaterialTheme.typography.labelLarge
         )
 
-        mealItems.forEach { item ->
+        if (mealItems.isEmpty()) {
+
             Text(
-                text = "${item.food.name} - ${item.quantityGrams} g"
+                text = "Nenhum alimento adicionado.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+        } else {
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(
+                    Dimens.spacingSmall
+                )
+            ) {
+
+                mealItems.forEach { item ->
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement =
+                            Arrangement.spacedBy(
+                                Dimens.spacingMedium
+                            )
+                    ) {
+
+                        Text(
+                            text = item.food.name,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Text(
+                            text = formatQuantity(
+                                item.quantityGrams
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
         }
 
-        Text(
-            text = "Total da refeição"
-        )
+        HorizontalDivider()
 
         Text(
-            text = "Calorias: ${String.format("%.0f", mealNutrients.calories)} kcal"
+            text = "Total da refeição",
+            style = MaterialTheme.typography.labelLarge
         )
 
-        Text(
-            text = "Proteínas: ${String.format("%.2f", mealNutrients.protein)} g"
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(
+                Dimens.spacingSmall
+            )
+        ) {
 
-        Text(
-            text = "Carboidratos: ${String.format("%.2f", mealNutrients.carbs)} g"
-        )
+            NutritionInfoRow(
+                label = "Calorias",
+                value = formatCalories(
+                    mealNutrients.calories
+                )
+            )
 
-        Text(
-            text = "Gorduras: ${String.format("%.2f", mealNutrients.fat)} g"
-        )
+            NutritionInfoRow(
+                label = "Proteínas",
+                value = formatGrams(
+                    mealNutrients.protein
+                )
+            )
 
-        Text(
-            text = "Fibras: ${String.format("%.2f", mealNutrients.fiber)} g"
-        )
+            NutritionInfoRow(
+                label = "Carboidratos",
+                value = formatGrams(
+                    mealNutrients.carbs
+                )
+            )
 
-        Text(
-            text = "Colesterol: ${String.format("%.2f", mealNutrients.cholesterol)} mg"
-        )
+            NutritionInfoRow(
+                label = "Gorduras",
+                value = formatGrams(
+                    mealNutrients.fat
+                )
+            )
+
+            NutritionInfoRow(
+                label = "Fibras",
+                value = formatGrams(
+                    mealNutrients.fiber
+                )
+            )
+
+            NutritionInfoRow(
+                label = "Colesterol",
+                value = formatMilligrams(
+                    mealNutrients.cholesterol
+                )
+            )
+        }
     }
 }
 
+private fun formatQuantity(
+    value: Double
+): String {
+    return String.format(
+        Locale("pt", "BR"),
+        "%.0f g",
+        value
+    )
+}
+
+private fun formatCalories(
+    value: Double
+): String {
+    return String.format(
+        Locale("pt", "BR"),
+        "%.0f kcal",
+        value
+    )
+}
+
+private fun formatGrams(
+    value: Double
+): String {
+    return String.format(
+        Locale("pt", "BR"),
+        "%.2f g",
+        value
+    )
+}
+
+private fun formatMilligrams(
+    value: Double
+): String {
+    return String.format(
+        Locale("pt", "BR"),
+        "%.2f mg",
+        value
+    )
+}

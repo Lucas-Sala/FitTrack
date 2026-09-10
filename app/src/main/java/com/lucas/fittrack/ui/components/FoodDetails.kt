@@ -1,20 +1,22 @@
 package com.lucas.fittrack.ui.components
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import com.lucas.fittrack.model.Food
 import com.lucas.fittrack.model.calculateNutrients
+import com.lucas.fittrack.ui.theme.Dimens
+import java.util.Locale
 
-@SuppressLint("DefaultLocale")
 @Composable
 fun FoodDetails(
     food: Food,
@@ -22,54 +24,90 @@ fun FoodDetails(
     onQuantityChange: (String) -> Unit,
     onAdd: () -> Unit
 ) {
-    val quantity = quantityText.toDoubleOrNull() ?: 0.0
+    val quantity =
+        quantityText.toDoubleOrNull() ?: 0.0
 
-    val nutrients = calculateNutrients(
-        food = food,
-        quantityGrams = quantity
-    )
+    val nutrients =
+        calculateNutrients(
+            food = food,
+            quantityGrams = quantity
+        )
 
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(
+            Dimens.spacingMedium
+        )
+    ) {
+
         Text(
             text = food.name,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
         OutlinedTextField(
             value = quantityText,
-            onValueChange = { newValue ->
-                onQuantityChange(newValue)
-            },
+            onValueChange = onQuantityChange,
+            modifier = Modifier.fillMaxWidth(),
             label = {
                 Text("Quantidade em gramas")
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
+            ),
+            singleLine = true
+        )
+
+        HorizontalDivider()
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(
+                Dimens.spacingSmall
             )
-        )
+        ) {
 
-        Text(
-            text = "Calorias: ${String.format("%.0f", nutrients.calories)} kcal"
-        )
+            NutritionInfoRow(
+                label = "Calorias",
+                value = formatCalories(
+                    nutrients.calories
+                )
+            )
 
-        Text(
-            text = "Proteínas: ${String.format("%.2f", nutrients.protein)} g"
-        )
+            NutritionInfoRow(
+                label = "Proteínas",
+                value = formatGrams(
+                    nutrients.protein
+                )
+            )
 
-        Text(
-            text = "Carboidratos: ${String.format("%.2f", nutrients.carbs)} g"
-        )
+            NutritionInfoRow(
+                label = "Carboidratos",
+                value = formatGrams(
+                    nutrients.carbs
+                )
+            )
 
-        Text(
-            text = "Gorduras: ${String.format("%.2f", nutrients.fat)} g"
-        )
+            NutritionInfoRow(
+                label = "Gorduras",
+                value = formatGrams(
+                    nutrients.fat
+                )
+            )
 
-        Text(
-            text = "Fibras: ${String.format("%.2f", nutrients.fiber)} g"
-        )
+            NutritionInfoRow(
+                label = "Fibras",
+                value = formatGrams(
+                    nutrients.fiber
+                )
+            )
 
-        Text(
-            text = "Colesterol: ${String.format("%.2f", nutrients.cholesterol)} mg"
-        )
+            NutritionInfoRow(
+                label = "Colesterol",
+                value = formatMilligrams(
+                    nutrients.cholesterol
+                )
+            )
+        }
 
         Button(
             onClick = onAdd,
@@ -78,4 +116,34 @@ fun FoodDetails(
             Text("Adicionar à refeição")
         }
     }
+}
+
+private fun formatCalories(
+    value: Double
+): String {
+    return String.format(
+        Locale("pt", "BR"),
+        "%.0f kcal",
+        value
+    )
+}
+
+private fun formatGrams(
+    value: Double
+): String {
+    return String.format(
+        Locale("pt", "BR"),
+        "%.2f g",
+        value
+    )
+}
+
+private fun formatMilligrams(
+    value: Double
+): String {
+    return String.format(
+        Locale("pt", "BR"),
+        "%.2f mg",
+        value
+    )
 }

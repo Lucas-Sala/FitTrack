@@ -65,11 +65,6 @@ fun DietScreen(
             style = MaterialTheme.typography.headlineLarge
         )
 
-        DateSelector(
-            selectedDate = uiState.selectedDate,
-            onDateChange = viewModel::selectDate
-        )
-
         SectionCard {
 
             Text(
@@ -136,22 +131,15 @@ fun DietScreen(
         }
 
         SectionCard {
-
-            Text(
-                text = "Refeição atual",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(
-                modifier = Modifier.height(
-                    Dimens.spacingMedium
-                )
-            )
-
             MealSummary(
                 mealItems = uiState.mealItems
             )
         }
+
+        DateSelector(
+            selectedDate = uiState.selectedDate,
+            onDateChange = viewModel::selectDate
+        )
 
         SectionCard {
 

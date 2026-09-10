@@ -17,9 +17,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lucas.fittrack.ui.components.CaloriesHistoryChart
+import com.lucas.fittrack.ui.components.NutritionHistoryChart
 import com.lucas.fittrack.ui.components.DateSelector
 import com.lucas.fittrack.ui.components.HistoryPeriodSelector
+import com.lucas.fittrack.ui.components.NutritionChartMetricSelector
 import com.lucas.fittrack.ui.components.PeriodSummaryCard
 import com.lucas.fittrack.ui.components.SectionCard
 import com.lucas.fittrack.ui.theme.Dimens
@@ -75,7 +76,7 @@ fun HistoryScreen(
 
         SectionCard {
             Text(
-                text = "Consumo de calorias",
+                text = "Histórico Nutricional",
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -85,9 +86,15 @@ fun HistoryScreen(
                 )
             )
 
-            CaloriesHistoryChart(
+            NutritionHistoryChart(
                 history = uiState.nutritionHistory,
-                calorieGoal = uiState.nutritionGoals.calories
+                nutritionGoals = uiState.nutritionGoals,
+                selectedMetric = uiState.nutritionChartMetric
+            )
+
+            NutritionChartMetricSelector(
+                selectedMetric = uiState.nutritionChartMetric,
+                onMetricSelected = viewModel::selectNutritionChartMetric
             )
         }
 
