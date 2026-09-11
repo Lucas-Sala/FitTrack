@@ -2,6 +2,7 @@ package com.lucas.fittrack.ui.screen
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +38,9 @@ fun HistoryScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(
+                MaterialTheme.colorScheme.background
+            )
             .verticalScroll(rememberScrollState())
             .padding(Dimens.screenPadding),
         verticalArrangement = Arrangement.spacedBy(

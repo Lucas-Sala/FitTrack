@@ -1,5 +1,6 @@
 package com.lucas.fittrack.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,8 @@ import com.lucas.fittrack.ui.components.SectionCard
 import com.lucas.fittrack.ui.theme.Dimens
 import com.lucas.fittrack.ui.viewmodel.HomeViewModel
 
+
+
 @Composable
 fun SettingsScreen(
     viewModel: HomeViewModel,
@@ -29,6 +32,9 @@ fun SettingsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(
+                MaterialTheme.colorScheme.background
+            )
             .verticalScroll(rememberScrollState())
             .padding(Dimens.screenPadding),
         verticalArrangement = Arrangement.spacedBy(

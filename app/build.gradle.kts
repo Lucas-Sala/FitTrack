@@ -20,13 +20,23 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+//    buildTypes {
+//        release {
+//            optimization {
+//                enable = false
+//            }
+//        }
+//    }
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("debug")
+
             optimization {
                 enable = false
             }
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -51,6 +61,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.ui)
     implementation(libs.vico.compose)
     implementation(libs.vico.compose.m3)
     implementation("org.apache.commons:commons-csv:1.14.0")

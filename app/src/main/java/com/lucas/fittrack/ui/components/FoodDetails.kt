@@ -3,6 +3,7 @@ package com.lucas.fittrack.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -11,7 +12,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import com.lucas.fittrack.model.Food
 import com.lucas.fittrack.model.calculateNutrients
 import com.lucas.fittrack.ui.theme.Dimens
@@ -24,6 +36,20 @@ fun FoodDetails(
     onQuantityChange: (String) -> Unit,
     onAdd: () -> Unit
 ) {
+    val focusManager =
+        LocalFocusManager.current
+
+    val keyboardController =
+        LocalSoftwareKeyboardController.current
+
+    var quantityFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = quantityText
+            )
+        )
+    }
+
     val quantity =
         quantityText.toDoubleOrNull() ?: 0.0
 
@@ -32,6 +58,24 @@ fun FoodDetails(
             food = food,
             quantityGrams = quantity
         )
+
+    LaunchedEffect(quantityText) {
+        if (
+            quantityFieldValue.text != quantityText
+        ) {
+            quantityFieldValue =
+                quantityFieldValue.copy(
+                    text = quantityText,
+                    selection = TextRange(
+                        quantityText.length
+                    )
+                )
+        }
+    }
+
+    LaunchedEffect(food.id) {
+        focusManager.clearFocus()
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(
@@ -43,19 +87,6 @@ fun FoodDetails(
             text = food.name,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        OutlinedTextField(
-            value = quantityText,
-            onValueChange = onQuantityChange,
-            modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text("Quantidade em gramas")
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Decimal
-            ),
-            singleLine = true
         )
 
         HorizontalDivider()
@@ -109,8 +140,62 @@ fun FoodDetails(
             )
         }
 
+        OutlinedTextField(
+            value = quantityFieldValue,
+
+            onValueChange = { newValue ->
+
+                quantityFieldValue =
+                    newValue
+
+                onQuantityChange(
+                    newValue.text
+                )
+            },
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+
+                    if (
+                        focusState.isFocused
+                    ) {
+                        quantityFieldValue =
+                            quantityFieldValue.copy(
+                                selection = TextRange(
+                                    start = 0,
+                                    end = quantityFieldValue.text.length
+                                )
+                            )
+                    }
+                },
+
+            label = {
+                Text("Quantidade em gramas")
+            },
+
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal,
+                imeAction = ImeAction.Done
+            ),
+
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                }
+            ),
+
+            singleLine = true
+        )
+
         Button(
-            onClick = onAdd,
+            onClick = {
+                focusManager.clearFocus()
+                keyboardController?.hide()
+
+                onAdd()
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Adicionar à refeição")
