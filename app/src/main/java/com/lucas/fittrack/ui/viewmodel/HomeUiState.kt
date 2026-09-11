@@ -12,6 +12,7 @@ import com.lucas.fittrack.model.Nutrients
 import com.lucas.fittrack.model.NutritionChartMetric
 import java.time.LocalDate
 import com.lucas.fittrack.model.NutritionGoals
+import java.time.LocalDateTime
 
 data class HomeUiState @RequiresApi(Build.VERSION_CODES.O) constructor(
     val foods: List<Food> = emptyList(),
@@ -22,6 +23,9 @@ data class HomeUiState @RequiresApi(Build.VERSION_CODES.O) constructor(
     val mealItems: List<MealItem> = emptyList(),
     val selectedMealType: MealType = MealType.LUNCH,
     val selectedDate: LocalDate = LocalDate.now(),
+
+    val editingMealId: Long? = null,
+    val editingMealDateTime: LocalDateTime? = null,
 
     val mealsOfSelectedDate: List<Meal> = emptyList(),
 

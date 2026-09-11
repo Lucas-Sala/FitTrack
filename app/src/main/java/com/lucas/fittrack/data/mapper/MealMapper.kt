@@ -10,6 +10,7 @@ import java.time.LocalDateTime
 
 fun Meal.toEntity(): MealEntity {
     return MealEntity(
+        id = id,
         type = type.name,
         dateTime = dateTime.toString()
     )
@@ -27,6 +28,7 @@ fun MealEntity.toMeal(
     items: List<MealItem>
 ): Meal {
     return Meal(
+        id = id,
         type = MealType.valueOf(type),
         dateTime = LocalDateTime.parse(dateTime),
         items = items
@@ -44,6 +46,7 @@ fun MealWithItems.toMeal(): Meal {
     }
 
     return Meal(
+        id = meal.id,
         type = MealType.valueOf(meal.type),
         dateTime = LocalDateTime.parse(meal.dateTime),
         items = mealItems

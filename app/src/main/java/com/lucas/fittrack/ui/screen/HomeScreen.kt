@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lucas.fittrack.model.Meal
 import com.lucas.fittrack.ui.components.DailySummaryCard
 import com.lucas.fittrack.ui.components.DateSelector
 import com.lucas.fittrack.ui.components.MealCard
@@ -31,6 +32,7 @@ import com.lucas.fittrack.ui.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
+    onEditMeal: (Meal) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -82,7 +84,15 @@ fun HomeScreen(
 
                 uiState.mealsOfSelectedDate.forEach { meal ->
                     MealCard(
-                        meal = meal
+                        meal = meal,
+
+                        onEdit = {
+                            onEditMeal(meal)
+                        },
+
+                        onDelete = {
+                            viewModel.deleteMeal(meal)
+                        }
                     )
                 }
             }

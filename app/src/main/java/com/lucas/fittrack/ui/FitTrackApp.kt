@@ -32,6 +32,33 @@ fun FitTrackApp(
 ) {
     val navController = rememberNavController()
 
+    fun navigateTo(
+        destination: AppDestination
+    ) {
+        val isEditingMeal =
+            viewModel.uiState.value.editingMealId != null
+
+        if (
+            isEditingMeal &&
+            destination != AppDestination.Diet
+        ) {
+            viewModel.cancelMealEditing()
+        }
+
+        navController.navigate(
+            destination.route
+        ) {
+            popUpTo(
+                navController.graph.startDestinationId
+            ) {
+                saveState = true
+            }
+
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     val destinations = listOf(
         AppDestination.Home,
         AppDestination.Diet,
@@ -74,19 +101,11 @@ fun FitTrackApp(
                         selected =
                             currentRoute == item.destination.route,
 
-                        onClick = {
-                            navController.navigate(
-                                item.destination.route
-                            ) {
-                                popUpTo(
-                                    navController.graph.startDestinationId
-                                ) {
-                                    saveState = true
-                                }
 
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                        onClick = {
+                            navigateTo(
+                                item.destination
+                            )
                         },
 
                         icon = {
@@ -117,15 +136,34 @@ fun FitTrackApp(
         ) {
             composable(AppDestination.Home.route) {
                 HomeScreen(
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    onEditMeal = { meal ->
+
+                        viewModel.editMeal(meal)
+
+                        navigateTo(
+                            AppDestination.Diet
+                        )
+                    }
                 )
             }
 
             composable(AppDestination.Diet.route) {
+
                 DietScreen(
                     viewModel = viewModel,
-                    onSearchTextChange = viewModel::updateFoodSearchText,
-                    onCategorySelected = viewModel::selectFoodCategory
+
+                    onSearchTextChange =
+                        viewModel::updateFoodSearchText,
+
+                    onCategorySelected =
+                        viewModel::selectFoodCategory,
+
+                    onEditingFinished = {
+                        navigateTo(
+                            AppDestination.Home
+                        )
+                    }
                 )
             }
 

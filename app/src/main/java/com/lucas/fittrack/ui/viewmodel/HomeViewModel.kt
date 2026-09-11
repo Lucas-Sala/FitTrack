@@ -180,27 +180,64 @@ class HomeViewModel(
 
     fun saveCurrentMeal() {
 
-        val currentState = _editableState.value
+        val currentState =
+            _editableState.value
 
         if (currentState.mealItems.isEmpty()) {
             return
         }
 
-        val currentTime = LocalDateTime.now().toLocalTime()
+        val editingMealId =
+            currentState.editingMealId
+
+        val dateTime =
+            if (editingMealId != null) {
+
+                currentState.editingMealDateTime
+                    ?: currentState.selectedDate
+                        .atTime(
+                            LocalDateTime
+                                .now()
+                                .toLocalTime()
+                        )
+
+            } else {
+
+                currentState.selectedDate.atTime(
+                    LocalDateTime
+                        .now()
+                        .toLocalTime()
+                )
+            }
 
         val meal = Meal(
+            id = editingMealId ?: 0,
             type = currentState.selectedMealType,
-            dateTime = currentState.selectedDate.atTime(currentTime),
+            dateTime = dateTime,
             items = currentState.mealItems
         )
 
         viewModelScope.launch {
 
-            mealRepository.insertMeal(meal)
+            if (editingMealId == null) {
 
-            _editableState.value = _editableState.value.copy(
-                mealItems = emptyList()
-            )
+                mealRepository.insertMeal(
+                    meal
+                )
+
+            } else {
+
+                mealRepository.updateMeal(
+                    meal
+                )
+            }
+
+            _editableState.value =
+                _editableState.value.copy(
+                    mealItems = emptyList(),
+                    editingMealId = null,
+                    editingMealDateTime = null
+                )
         }
     }
 
@@ -339,6 +376,81 @@ class HomeViewModel(
         _editableState.value =
             _editableState.value.copy(
                 nutritionChartMetric = metric
+            )
+    }
+
+    fun removeFoodFromCurrentMeal(
+        item: MealItem
+    ) {
+        _editableState.value =
+            _editableState.value.copy(
+                mealItems =
+                    _editableState.value.mealItems
+                        .filterNot { it === item }
+            )
+    }
+
+    fun updateMealItemQuantity(
+        item: MealItem,
+        newQuantity: Double
+    ) {
+        _editableState.value =
+            _editableState.value.copy(
+                mealItems =
+                    _editableState.value.mealItems.map {
+                        if (it === item) {
+                            it.copy(
+                                quantityGrams = newQuantity
+                            )
+                        } else {
+                            it
+                        }
+                    }
+            )
+    }
+
+    fun editMeal(
+        meal: Meal
+    ) {
+        _editableState.value =
+            _editableState.value.copy(
+                editingMealId = meal.id,
+                editingMealDateTime = meal.dateTime,
+                mealItems = meal.items,
+                selectedMealType = meal.type,
+                selectedDate = meal.dateTime.toLocalDate()
+            )
+    }
+
+    fun deleteMeal(
+        meal: Meal
+    ) {
+        viewModelScope.launch {
+
+            mealRepository.deleteMeal(
+                mealId = meal.id
+            )
+
+            if (
+                _editableState.value.editingMealId ==
+                meal.id
+            ) {
+                _editableState.value =
+                    _editableState.value.copy(
+                        mealItems = emptyList(),
+                        editingMealId = null,
+                        editingMealDateTime = null
+                    )
+            }
+        }
+    }
+
+    fun cancelMealEditing() {
+        _editableState.value =
+            _editableState.value.copy(
+                mealItems = emptyList(),
+                editingMealId = null,
+                editingMealDateTime = null
             )
     }
 }

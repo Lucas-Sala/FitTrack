@@ -27,7 +27,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lucas.fittrack.model.MealItem
 import com.lucas.fittrack.ui.components.DateSelector
+import com.lucas.fittrack.ui.components.EditMealItemDialog
 import com.lucas.fittrack.ui.components.FoodDetails
 import com.lucas.fittrack.ui.components.FoodList
 import com.lucas.fittrack.ui.components.MealSummary
@@ -42,12 +44,17 @@ fun DietScreen(
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
     onSearchTextChange: (String) -> Unit,
-    onCategorySelected: (String?) -> Unit
+    onCategorySelected: (String?) -> Unit,
+    onEditingFinished: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var mealTypeMenuExpanded by remember {
         mutableStateOf(false)
+    }
+
+    var editingItem by remember {
+        mutableStateOf<MealItem?>(null)
     }
 
     Column(
@@ -132,7 +139,13 @@ fun DietScreen(
 
         SectionCard {
             MealSummary(
-                mealItems = uiState.mealItems
+                mealItems = uiState.mealItems,
+                onRemoveItem = { item ->
+                    viewModel.removeFoodFromCurrentMeal(item)
+                },
+                onEditItem = { item ->
+                    editingItem = item
+                }
             )
         }
 
@@ -175,12 +188,57 @@ fun DietScreen(
 
             Button(
                 onClick = {
+
+                    val wasEditing =
+                        uiState.editingMealId != null
+
                     viewModel.saveCurrentMeal()
+
+                    if (wasEditing) {
+                        onEditingFinished()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Salvar refeição")
+                Text(
+                    if (uiState.editingMealId == null) {
+                        "Salvar refeição"
+                    } else {
+                        "Salvar alterações"
+                    }
+                )
             }
+            if (uiState.editingMealId != null) {
+
+                OutlinedButton(
+                    onClick = {
+                        viewModel.cancelMealEditing()
+                        onEditingFinished()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Cancelar edição")
+                }
+            }
+        }
+
+        editingItem?.let { item ->
+
+            EditMealItemDialog(
+                item = item,
+                onDismiss = {
+                    editingItem = null
+                },
+                onConfirm = { newQuantity ->
+
+                    viewModel.updateMealItemQuantity(
+                        item = item,
+                        newQuantity = newQuantity
+                    )
+
+                    editingItem = null
+                }
+            )
         }
     }
 }

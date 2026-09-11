@@ -9,17 +9,21 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.lucas.fittrack.model.Meal
+import com.lucas.fittrack.model.MealItem
 import com.lucas.fittrack.model.calculateMealNutrients
 import com.lucas.fittrack.ui.theme.Dimens
 
 @Composable
 fun MealCard(
     meal: Meal,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val nutrients = calculateMealNutrients(meal)
@@ -52,6 +56,7 @@ fun MealCard(
                     text = "${nutrients.calories.toInt()} kcal",
                     style = MaterialTheme.typography.bodyMedium
                 )
+
             }
 
             HorizontalDivider()
@@ -82,7 +87,8 @@ fun MealCard(
                     "Pro: ${nutrients.protein.toInt()} g  •  " +
                             "Car: ${nutrients.carbs.toInt()} g  •  " +
                             "Gor: ${nutrients.fat.toInt()} g",
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text =
@@ -91,6 +97,27 @@ fun MealCard(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    Dimens.spacingSmall
+                )
+            ) {
+                OutlinedButton(
+                    onClick = onEdit,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Editar")
+                }
+
+                OutlinedButton(
+                    onClick = onDelete,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Excluir")
+                }
+            }
         }
     }
 }

@@ -34,4 +34,29 @@ class MealRepository(
                 }
             }
     }
+
+    suspend fun updateMeal(
+        meal: Meal
+    ) {
+        val mealEntity =
+            meal.toEntity()
+
+        val itemEntities =
+            meal.items.map { item ->
+                item.toEntity()
+            }
+
+        mealDao.updateMealWithItems(
+            meal = mealEntity,
+            items = itemEntities
+        )
+    }
+
+    suspend fun deleteMeal(
+        mealId: Long
+    ) {
+        mealDao.deleteMealWithItems(
+            mealId = mealId
+        )
+    }
 }
